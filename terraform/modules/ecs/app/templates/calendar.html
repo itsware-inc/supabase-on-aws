@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Leave Day Calendar (All Users)</h1>
+
+<div id="calendar"></div>
+
+<script>
+
+    $(document).ready(function() {
+        $('#calendar').fullCalendar({
+
+            events: [
+                {
+                    title: 'User A - Leave Day',
+                    start: '2023-08-10',
+                    end: '2023-08-12'
+                },
+                {
+                    title: 'User B - Leave Day',
+                    start: '2023-08-15',
+                    end: '2023-08-18'
+                },
+                
+            ]
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Leave Booking Calendar</h1>
+
+    <form method="post">
+        <label for="user_name">Your Name:</label>
+        <input type="text" id="user_name" name="user_name" required>
+
+        <label for="from_date">From Date:</label>
+        <input type="date" id="from_date" name="from_date" required>
+
+        <label for="to_date">To Date:</label>
+        <input type="date" id="to_date" name="to_date" required>
+
+        <input type="submit" value="Book Leave">
+    </form>
+
+    <!-- Display the calendar -->
+    <div id="calendar"></div>
+
+    <h2>All Leave Days</h2>
+    <ul>
+        {% for leave_day in leave_days %}
+        <li>
+            {{ leave_day['from_date'] }} to {{ leave_day['to_date'] }} - Booked by {{ leave_day['name'] }}
+            <form method="post" action="{{ url_for('delete_leave',leave_id=leave_day['leave_id']) }}" style="display: inline;">
+                <input type="submit" value="Delete">
+            </form>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <script>
+        $(document).ready(function() {
+            $('#calendar').fullCalendar({
+                events: [
+                    {% for leave_day in leave_days %}
+                    {
+                        title: 'Leave - '+ '{{ leave_day["name"] }}',
+                        start: '{{ leave_day["from_date"] }}',
+                        end: '{{ leave_day["to_date"] }}',
+                        extendedProps: { user: '{{ leave_day["name"] }}' }
+                    },
+                    {% endfor %}
+                ],
+                header: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'month,agendaWeek,agendaDay'
+                },
+                selectable: true,
+                select: function(info) {
+                    var fromDate = info.startStr;
+                    var toDate = info.endStr;
+                    var userName = $('#user_name').val(); // Get the user name from the input field
+                    $.post('/book_leave', {from_date: fromDate, to_date: toDate, user_name: userName});
+                    $('#calendar').fullCalendar('renderEvent', {
+                        title: 'Leave',
+                        start: info.start,
+                        end: info.end,
+                        allDay: info.allDay,
+                        extendedProps: { user: userName }
+                    }, true);
+                },
+
+            });
+        });
+    </script>
+    
+{% endblock %}
